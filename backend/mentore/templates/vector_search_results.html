@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Search Results</title>
+</head>
+
+<body>
+    <h1>🔍 Results for: "{{ query }}"</h1>
+
+    {% if results.documents.0 %}
+    <ul>
+        {% for doc in results.documents.0 %}
+        <li>{{ doc }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No matches found.</p>
+    {% endif %}
+
+    <br>
+    <a href="/search/">Search Again</a>
+</body>
+
+</html>

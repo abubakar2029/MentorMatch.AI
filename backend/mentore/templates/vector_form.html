@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Vector Bio Form</title>
+</head>
+
+<body>
+    <h2>Enter your Bio</h2>
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="bio" rows="4" cols="50"></textarea><br><br>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+
+</html>

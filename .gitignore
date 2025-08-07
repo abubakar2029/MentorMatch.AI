@@ -1,0 +1,20 @@
+# .gitignore
+venv/
+__pycache__/
+*.pyc
+*.sqlite3
+db.sqlite3
+.env
+*.log
+*.pot
+*.pyc
+.DS_Store
+*.swp
+*.swo
+*.bak
+*.tmp
+*.idea/
+*.vscode/
+*.egg-info/
+staticfiles/
+media/

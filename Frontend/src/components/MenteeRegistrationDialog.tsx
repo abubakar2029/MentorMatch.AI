@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowRight, User } from "lucide-react";
+import axios from "axios";
 
 interface MenteeRegistrationDialogProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ export const MenteeRegistrationDialog = ({ isOpen, onClose }: MenteeRegistration
     email: "",
     password: "",
     age: "",
+    profilePhoto: "https://t4.ftcdn.net/jpg/02/44/43/69/360_F_244436923_vkMe10KKKiw5bjhZeRDT05moxWcPpdmb.jpg",
     gender: "",
     country: "",
     currentRole: "",
@@ -73,10 +75,29 @@ export const MenteeRegistrationDialog = ({ isOpen, onClose }: MenteeRegistration
     setErrors(prev => ({ ...prev, [field]: "" }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateStep()) {
-      console.log("Mentee registration data:", formData);
-      onClose();
+      try {
+        const response = await axios.post(
+          "http://127.0.0.1:8000/api/mentee/register/",
+          formData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("✅ Registration successful:", response.data);
+        onClose();
+      } catch (error: any) {
+        console.error("❌ Registration failed:", error.response?.data || error.message);
+        // Optional: Show error to user
+        setErrors(prev => ({
+          ...prev,
+          submit: error.response?.data?.message || "Registration failed. Please try again."
+        }));
+      }
     }
   };
 
@@ -151,16 +172,21 @@ export const MenteeRegistrationDialog = ({ isOpen, onClose }: MenteeRegistration
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="gender">Gender</Label>
-                    <Input
+                    <select
                       id="gender"
                       value={formData.gender}
                       onChange={(e) => handleInputChange('gender', e.target.value)}
-                      placeholder="Enter your gender"
-                    />
+                      className="w-full border border-gray-300 rounded-md p-2"
+                    >
+                      <option value="">Select gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
                   </div>
+
                 </div>
-                <Button 
-                  onClick={() => validateStep() && setStep(2)} 
+                <Button
+                  onClick={() => validateStep() && setStep(2)}
                   className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   Continue <ArrowRight className="w-4 h-4 ml-2" />
@@ -214,15 +240,15 @@ export const MenteeRegistrationDialog = ({ isOpen, onClose }: MenteeRegistration
                   </div>
                 </div>
                 <div className="flex gap-4 mt-6">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setStep(1)} 
+                  <Button
+                    variant="outline"
+                    onClick={() => setStep(1)}
                     className="w-full"
                   >
                     Back
                   </Button>
-                  <Button 
-                    onClick={() => validateStep() && setStep(3)} 
+                  <Button
+                    onClick={() => validateStep() && setStep(3)}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     Continue <ArrowRight className="w-4 h-4 ml-2" />
@@ -276,15 +302,15 @@ export const MenteeRegistrationDialog = ({ isOpen, onClose }: MenteeRegistration
                   </div>
                 </div>
                 <div className="flex gap-4 mt-6">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setStep(2)} 
+                  <Button
+                    variant="outline"
+                    onClick={() => setStep(2)}
                     className="w-full"
                   >
                     Back
                   </Button>
-                  <Button 
-                    onClick={handleSubmit} 
+                  <Button
+                    onClick={handleSubmit}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     Complete Registration

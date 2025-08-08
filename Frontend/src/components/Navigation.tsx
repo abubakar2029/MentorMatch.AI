@@ -32,8 +32,8 @@ export const Navigation = () => {
               How It Works
             </a>
             <Button 
-              variant="ghost" 
-              className="text-muted-foreground hover:text-foreground"
+              // variant="ghost" 
+              className="bg-transparent text-gray-500 hover:text-gray-800 hover:bg-transparent"
               onClick={() => setIsSignInOpen(true)}
             >
               Sign In

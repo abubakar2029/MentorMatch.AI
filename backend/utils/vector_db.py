@@ -1,23 +1,21 @@
 # utils/vector_db.py
-
 import chromadb
-from chromadb.config import Settings
+from utils.embeddings import get_embedding
 
-# ✅ Use the new PersistentClient
-client = chromadb.PersistentClient(path="./chroma_db")
+client = chromadb.PersistentClient(path="./chroma_store")
+collection = client.get_or_create_collection("mentors")
 
-collection = client.get_or_create_collection("profiles")
-
-def add_to_vector_db(profile_id, text, embedding):
+def add_to_vector_db(profile_id, text, embedding=None):
+    if embedding is None:
+        embedding = get_embedding(text)
     collection.add(
         documents=[text],
         embeddings=[embedding],
-        ids=[str(profile_id)]
+        ids=[str(int(profile_id))]
     )
-    print("✅ Added to vector DB")
+    print(f"✅ Added profile {profile_id} to vector DB")
 
 def query_similar_profiles(query_text, top_k=3):
-    from utils.embeddings import get_embedding
     embedding = get_embedding(query_text)
     results = collection.query(
         query_embeddings=[embedding],

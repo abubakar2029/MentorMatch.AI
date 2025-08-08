@@ -1,17 +1,299 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Vector Bio Form</title>
+    <style>
+        :root {
+            --bg-start: #f7f7f8;
+            --bg-end: #ececf1;
+            --card-bg: #ffffff;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #059669;
+            --ring: rgba(5, 150, 105, .35);
+            --shadow: 0 10px 25px rgba(0, 0, 0, .06), 0 4px 10px rgba(0, 0, 0, .05);
+            --radius: 14px;
+            --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Noto Sans, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            color: var(--text);
+            background:
+                radial-gradient(1200px 800px at 20% -10%, var(--bg-end), transparent 60%) no-repeat,
+                radial-gradient(1400px 900px at 120% 0%, var(--bg-end), transparent 55%) no-repeat,
+                linear-gradient(180deg, var(--bg-start), #ffffff 40%);
+        }
+
+        .container {
+            min-height: 100%;
+            display: grid;
+            align-items: center;
+            justify-items: center;
+            padding: 32px 16px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 880px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 28px 28px 8px;
+            border-bottom: 1px solid var(--border);
+            background:
+                radial-gradient(600px 200px at 20% 0%, rgba(5, 150, 105, .06), transparent 60%) no-repeat,
+                radial-gradient(600px 200px at 80% 0%, rgba(16, 185, 129, .05), transparent 60%) no-repeat,
+                linear-gradient(180deg, #ffffff, #fcfcfd);
+        }
+
+        .title {
+            margin: 0 0 6px;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -.01em;
+        }
+
+        .subtitle {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: .98rem;
+        }
+
+        .content {
+            padding: 24px 28px 28px;
+        }
+
+        /* Form layout */
+        form {
+            display: grid;
+            gap: 18px;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        label {
+            font-size: .95rem;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        /* Inputs */
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            font: inherit;
+            color: var(--text);
+            background: #fcfcfd;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+        }
+
+        textarea.textarea {
+            min-height: 140px;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #9ca3af;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--ring);
+            background: #ffffff;
+        }
+
+        /* Select multiple helper */
+        small {
+            color: var(--muted);
+            font-size: .85rem;
+        }
+
+        /* Number input tweaks */
+        input[type="number"] {
+            appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            margin: 0;
+            appearance: none;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding-top: 6px;
+        }
+
+        .btn {
+            appearance: none;
+            border: 1px solid transparent;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: .01em;
+            padding: 11px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform .04s ease, filter .2s ease, background .2s ease, box-shadow .2s ease;
+            box-shadow: 0 8px 18px rgba(5, 150, 105, .15);
+        }
+
+        .btn:hover {
+            filter: brightness(1.02);
+            box-shadow: 0 10px 22px rgba(5, 150, 105, .20);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Responsive grid: two columns on larger screens, keeping markup unchanged */
+        @media (min-width: 820px) {
+            form {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            /* Make larger fields span both columns without changing markup */
+            #skills,
+            #bio,
+            #availability,
+            #user_type,
+            #email,
+            #full_name,
+            #job_role,
+            #industry {
+                grid-column: 1 / -1;
+            }
+
+            .actions {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 640px) {
+
+            .header,
+            .content {
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <h2>Enter your Bio</h2>
-    <form method="post">
-        {% csrf_token %}
-        <textarea name="bio" rows="4" cols="50"></textarea><br><br>
-        <button type="submit">Submit</button>
-    </form>
+    <main class="container" role="main">
+        <section class="card" aria-labelledby="form-title">
+            <header class="header">
+                <h1 id="form-title" class="title">Register Your Profile</h1>
+                <p class="subtitle">Provide your details so we can match you with the best mentor or mentee.</p>
+            </header>
+
+            <div class="content">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="field">
+                        <label for="full_name">Full Name</label>
+                        <input type="text" id="full_name" name="full_name" placeholder="Jane Doe" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="user_type">I am a</label>
+                        <select id="user_type" name="user_type" required>
+                            <option value="">-- Select --</option>
+                            <option value="mentor">Mentor</option>
+                            <option value="mentee">Mentee</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="job_role">Job Role / Current Role</label>
+                        <input type="text" id="job_role" name="job_role" placeholder="Software Engineer, Student..."
+                            required>
+                    </div>
+
+                    <div class="field">
+                        <label for="industry">Industry</label>
+                        <input type="text" id="industry" name="industry" placeholder="IT, Healthcare..." required>
+                    </div>
+
+                    <div class="field">
+                        <label for="experience_years">Years of Experience</label>
+                        <input type="number" id="experience_years" name="experience_years" min="0" value="0">
+                    </div>
+
+                    <div class="field">
+                        <label for="skills">Mentorship Topics / Skills</label>
+                        <input type="text" id="skills" name="skills" placeholder="Machine Learning, Career Guidance..."
+                            required>
+                    </div>
+
+                    <div class="field">
+                        <label for="availability">Availability</label>
+                        <select id="availability" name="availability" multiple required>
+                            <option value="Weekdays">Weekdays</option>
+                            <option value="Weekends">Weekends</option>
+                            <option value="Evenings">Evenings</option>
+                        </select>
+                        <small id="availability-help">Hold CTRL or CMD to select multiple</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="bio">Short Bio</label>
+                        <textarea id="bio" name="bio" class="textarea" rows="4"
+                            placeholder="Write a short bio, e.g., '5 years in software development, passionate about AI.'"></textarea>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn" aria-label="Submit profile for vectorization">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
 </body>
 
 </html>

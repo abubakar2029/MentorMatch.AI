@@ -121,3 +121,25 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+MONGO_DB_NAME = "MentorMatchAI"  # Your local DB name
+
+from mongoengine import connect, get_connection
+
+try:
+    connect(
+        db=MONGO_DB_NAME,
+        host="localhost",
+        port=27017,  # Default MongoDB port
+        username=None,  # Or your MongoDB username if auth enabled
+        password=None   # Or your MongoDB password if auth enabled
+    )
+    conn = get_connection()
+    print(f"✅ Connected local MongoDB database '{MONGO_DB_NAME}'")
+except Exception as e:
+    print(f"❌ MongoDB connection failed: {e}")

@@ -1,4 +1,7 @@
 import { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,15 +18,36 @@ export const SignInDialog = ({ isOpen, onClose }: SignInDialogProps) => {
     email: "",
     password: ""
   });
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Sign in data:", formData);
-    onClose();
+    setLoading(true);
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/auth/signin", formData);
+
+      // ✅ Store in localStorage
+      localStorage.setItem("userData", JSON.stringify(response.data));
+
+      // ✅ Log & Toast success
+      console.log("✅ Sign in successful:", response.data);
+      toast.success("Signed in successfully!");
+
+      onClose();
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || "Sign in failed";
+      console.error("❌ Sign in error:", errorMsg);
+
+      // ✅ Toast error
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,7 +64,7 @@ export const SignInDialog = ({ isOpen, onClose }: SignInDialogProps) => {
               id="email"
               type="email"
               value={formData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
+              onChange={(e) => handleInputChange("email", e.target.value)}
               placeholder="Enter your email"
               required
             />
@@ -52,14 +76,15 @@ export const SignInDialog = ({ isOpen, onClose }: SignInDialogProps) => {
               id="password"
               type="password"
               value={formData.password}
-              onChange={(e) => handleInputChange('password', e.target.value)}
+              onChange={(e) => handleInputChange("password", e.target.value)}
               placeholder="Enter your password"
               required
             />
           </div>
 
-          <Button type="submit" className="w-full">
-            Sign In <ArrowRight className="w-4 h-4 ml-2" />
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Signing In..." : "Sign In"}{" "}
+            {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
           </Button>
 
           <div className="text-center">

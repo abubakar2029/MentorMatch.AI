@@ -8,6 +8,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowRight, Briefcase } from "lucide-react";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface MentorRegistrationDialogProps {
   isOpen: boolean;
@@ -93,9 +95,17 @@ export const MentorRegistrationDialog = ({ isOpen, onClose }: MentorRegistration
         );
 
         console.log("✅ Registration successful:", response.data);
+        toast.success("Registration successful!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
         onClose();
       } catch (error: any) {
         console.error("❌ Registration failed:", error.response?.data || error.message);
+        toast.error(error.response?.data?.message || "Registration failed. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
         // Optional: Show error to user
         setErrors(prev => ({
           ...prev,

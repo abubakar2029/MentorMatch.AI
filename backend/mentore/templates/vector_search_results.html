@@ -8,16 +8,21 @@
 <body>
     <h1>🔍 Results for: "{{ query }}"</h1>
 
-    {% if results.documents.0 %}
+    <p>Found {{ results|length }} results:</p>
+    {% if results %}
     <ul>
-        {% for doc in results.documents.0 %}
-        <li>{{ doc }}</li>
+        {% for match in results %}
+        <li>
+            <h3>{{ match.name }}</h3>
+            <p>Role: {{ match.role }}</p>
+            <p>Bio: {{ match.bio }}</p>
+            <p>Match Score: {{ match.distance|floatformat:3 }}</p>
+        </li>
         {% endfor %}
     </ul>
     {% else %}
     <p>No matches found.</p>
     {% endif %}
-
     <br>
     <a href="/search/">Search Again</a>
 </body>

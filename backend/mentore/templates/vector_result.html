@@ -1,23 +1,284 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Vector Result</title>
+    <style>
+        :root {
+            --bg-start: #f7f7f8;
+            --bg-end: #ececf1;
+            --card-bg: #ffffff;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --success: #059669;
+            --ring: rgba(5, 150, 105, .35);
+            --shadow: 0 10px 25px rgba(0, 0, 0, .06), 0 4px 10px rgba(0, 0, 0, .05);
+            --radius: 14px;
+            --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Noto Sans, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            color: var(--text);
+            background:
+                radial-gradient(1200px 800px at 20% -10%, var(--bg-end), transparent 60%) no-repeat,
+                radial-gradient(1400px 900px at 120% 0%, var(--bg-end), transparent 55%) no-repeat,
+                linear-gradient(180deg, var(--bg-start), #ffffff 40%);
+        }
+
+        .container {
+            min-height: 100%;
+            display: grid;
+            align-items: center;
+            justify-items: center;
+            padding: 32px 16px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 980px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 28px 28px 12px;
+            border-bottom: 1px solid var(--border);
+            background:
+                radial-gradient(600px 200px at 20% 0%, rgba(5, 150, 105, .06), transparent 60%) no-repeat,
+                radial-gradient(600px 200px at 80% 0%, rgba(16, 185, 129, .05), transparent 60%) no-repeat,
+                linear-gradient(180deg, #ffffff, #fcfcfd);
+        }
+
+        .success-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .badge {
+            display: inline-grid;
+            place-items: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #ecfdf5;
+            border: 1px solid #d1fae5;
+            color: var(--success);
+            font-size: 16px;
+        }
+
+        .title {
+            margin: 0;
+            font-weight: 800;
+            font-size: 1.45rem;
+            letter-spacing: -.01em;
+        }
+
+        .subtitle {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: .98rem;
+        }
+
+        .content {
+            padding: 24px 28px 28px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .section {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fcfcfd;
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            background: #f9fafb;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: .95rem;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .section-body {
+            padding: 14px 16px;
+        }
+
+        /* Profile list styling */
+        .info {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .info li {
+            display: flex;
+            gap: 8px;
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .info strong {
+            min-width: 190px;
+            color: #374151;
+            font-weight: 700;
+        }
+
+        .original {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .code {
+            font-family: var(--mono);
+            font-size: .9rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #0f172a;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-start;
+            padding-top: 6px;
+        }
+
+        .link-back {
+            appearance: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            background: #ffffff;
+            color: #0f172a;
+            font-weight: 700;
+            letter-spacing: .01em;
+            padding: 10px 14px;
+            border-radius: 12px;
+            transition: border-color .2s ease, box-shadow .2s ease, transform .04s ease;
+        }
+
+        .link-back:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, .06);
+        }
+
+        .link-back:active {
+            transform: translateY(1px);
+        }
+
+        @media (min-width: 820px) {
+            .info {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .info strong {
+                min-width: 160px;
+            }
+        }
+
+        @media (max-width: 640px) {
+
+            .header,
+            .content {
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <h1>✅ Bio Vector Stored Successfully!</h1>
+    <main class="container" role="main">
+        <article class="card" aria-labelledby="result-title">
+            <header class="header">
+                <div class="success-row">
+                    <span class="badge" aria-hidden="true">✅</span>
+                    <h1 id="result-title" class="title">Profile stored successfully</h1>
+                </div>
+                <p class="subtitle">Your details and vector embedding are below.</p>
+            </header>
 
-    <h2>Original Text:</h2>
-    <p>{{ bio }}</p>
+            <div class="content">
+                <section class="section" aria-labelledby="profile-info-title">
+                    <div class="section-header">
+                        <h2 id="profile-info-title" class="section-title">Profile Information</h2>
+                    </div>
+                    <!-- <div class="section-body">
+                        <ul class="info">
+                            <li><strong>Name:</strong> <span>{{ fullName }}</span></li>
+                            <li><strong>Email:</strong> <span>{{ email }}</span></li>
+                            <li><strong>Role:</strong> <span>{{ roleType }}</span></li>
+                            <li><strong>Job/Role:</strong> <span>{{ jobRole }}</span></li>
+                            <li><strong>Industry:</strong> <span>{{ industry }}</span></li>
+                            <li><strong>Experience Years:</strong> <span>{{ experienceYears }}</span></li>
+                            <li><strong>Topics / Skills:</strong> <span>{{ mentorshipTopics }}</span></li>
+                            <li style="grid-column:1/-1;"><strong>Availability:</strong> <span>{{ availability }}</span>
+                            </li>
+                            <li style="grid-column:1/-1;"><strong>Bio:</strong> <span class="original">{{ bio }}</span>
+                            </li>
+                        </ul>
+                    </div> -->
+                </section>
 
-    <h2>Vector Embedding:</h2>
-    <pre style="white-space: pre-wrap; word-break: break-all;">
-        {{ embedding|safe }}
-    </pre>
+                <!-- <section class="section" aria-labelledby="embedding-title">
+                    <div class="section-header">
+                        <h2 id="embedding-title" class="section-title">Vector Embedding</h2>
+                    </div>
+                    <div class="section-body">
+                        <pre class="code">{{ embedding|safe }}</pre>
+                    </div>
+                </section> -->
 
-    <br>
-    <a href="/vector/">Go back</a>
+                <div class="actions">
+                    <a class="link-back" href="/register/" aria-label="Go back">← Go back</a>
+                </div>
+            </div>
+        </article>
+    </main>
 </body>
 
 </html>

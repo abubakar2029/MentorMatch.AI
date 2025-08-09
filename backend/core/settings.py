@@ -1,4 +1,8 @@
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+import pymongo
+from mongoengine import connect
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -58,16 +62,40 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+# Load .env variables
+load_dotenv()
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+MONGO_USER = os.getenv("MONGO_USER")
+MONGO_PASS = os.getenv("MONGO_PASS")
+MONGO_DB   = os.getenv("MONGO_DB")
+print(f"MongoDB User: {MONGO_USER}, Database: {MONGO_DB}")
+DATABASES = {
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': MONGO_DB,
+        'CLIENT': {
+            'host': f"mongodb+srv://abubakarzafar2029:{MONGO_PASS}@cluster0.wkvfdg4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+            'ssl': True
+        }
+    }
+}
+# Test MongoDB Atlas connection
+try:
+    # client = pymongo.MongoClient(
+    #     f"mongodb+srv://{MONGO_USER}:{MONGO_PASS}@cluster0.wkvfdg4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    #     serverSelectionTimeoutMS=5000
+    # )
+    # client.server_info()  # Force connection to check if it's working
+    connect(
+    db="MentorMatchAI",
+    username=MONGO_USER,
+    password=MONGO_PASS,
+    host="mongodb+srv://cluster0.wkvfdg4.mongodb.net/",
+    # authentication_source='admin'  # or your auth DB
+)
+    print(f"✅ Connected to MongoDB Atlas database '{MONGO_DB}'")
+except Exception as e:
+    print(f"❌ MongoDB Atlas connection failed: {e}")
 
 
 # Password validation
@@ -116,22 +144,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # from dotenv import load_dotenv
 # load_dotenv()
 
-MONGO_DB_NAME = "MentorMatchAI"  # Your local DB name
+# MONGO_DB_NAME = "MentorMatchAI"  # Your local DB name
 
-from mongoengine import connect, get_connection
+# from mongoengine import connect, get_connection
 
-try:
-    connect(
-        db=MONGO_DB_NAME,
-        host="localhost",
-        port=27017,  # Default MongoDB port
-        username=None,  # Or your MongoDB username if auth enabled
-        password=None   # Or your MongoDB password if auth enabled
-    )
-    conn = get_connection()
-    print(f"✅ Connected local MongoDB database '{MONGO_DB_NAME}'")
-except Exception as e:
-    print(f"❌ MongoDB connection failed: {e}")
+# try:
+#     connect(
+#         db=MONGO_DB_NAME,
+#         host="localhost",
+#         port=27017,  # Default MongoDB port
+#         username=None,  # Or your MongoDB username if auth enabled
+#         password=None   # Or your MongoDB password if auth enabled
+#     )
+#     conn = get_connection()
+#     print(f"✅ Connected local MongoDB database '{MONGO_DB_NAME}'")
+# except Exception as e:
+#     print(f"❌ MongoDB connection failed: {e}")
 
 # AUTH_USER_MODEL = 'mentore.CustomUser'
 # AUTHENTICATION_BACKENDS = [

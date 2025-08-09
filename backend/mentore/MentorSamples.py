@@ -2,7 +2,7 @@
   {
     "fullName": "Aisha Khan",
     "email": "aisha.khan@example.com",
-    "passwordHash": "hashed_password_1",
+    "password": "hashed_password_1",
     "profilePhoto": "https://example.com/photos/aisha.jpg",
     "age": 24,
     "gender": "Female",
@@ -20,7 +20,7 @@
   {
     "fullName": "David Lee",
     "email": "david.lee@example.com",
-    "passwordHash": "hashed_password_2",
+    "password": "hashed_password_2",
     "profilePhoto": "https://example.com/photos/david.jpg",
     "age": 30,
     "gender": "Male",
@@ -38,7 +38,7 @@
   {
     "fullName": "Maria Gonzalez",
     "email": "maria.g@example.com",
-    "passwordHash": "hashed_password_3",
+    "password": "hashed_password_3",
     "profilePhoto": "https://example.com/photos/maria.jpg",
     "age": 27,
     "gender": "Female",
@@ -56,7 +56,7 @@
   {
     "fullName": "Ahmed Raza",
     "email": "ahmed.raza@example.com",
-    "passwordHash": "hashed_password_4",
+    "password": "hashed_password_4",
     "profilePhoto": "https://example.com/photos/ahmed.jpg",
     "age": 22,
     "gender": "Male",
@@ -74,7 +74,7 @@
   {
     "fullName": "Emily Carter",
     "email": "emily.carter@example.com",
-    "passwordHash": "hashed_password_5",
+    "password": "hashed_password_5",
     "profilePhoto": "https://example.com/photos/emily.jpg",
     "age": 35,
     "gender": "Female",
@@ -92,7 +92,7 @@
   {
     "fullName": "Hiroshi Tanaka",
     "email": "hiroshi.t@example.com",
-    "passwordHash": "hashed_password_6",
+    "password": "hashed_password_6",
     "profilePhoto": "https://example.com/photos/hiroshi.jpg",
     "age": 28,
     "gender": "Male",
@@ -110,7 +110,7 @@
   {
     "fullName": "Sarah Johnson",
     "email": "sarah.j@example.com",
-    "passwordHash": "hashed_password_7",
+    "password": "hashed_password_7",
     "profilePhoto": "https://example.com/photos/sarah.jpg",
     "age": 26,
     "gender": "Female",
@@ -128,7 +128,7 @@
   {
     "fullName": "Mohammed Al-Sayed",
     "email": "mohammed.s@example.com",
-    "passwordHash": "hashed_password_8",
+    "password": "hashed_password_8",
     "profilePhoto": "https://example.com/photos/mohammed.jpg",
     "age": 32,
     "gender": "Male",
@@ -146,7 +146,7 @@
   {
     "fullName": "Olivia Brown",
     "email": "olivia.b@example.com",
-    "passwordHash": "hashed_password_9",
+    "password": "hashed_password_9",
     "profilePhoto": "https://example.com/photos/olivia.jpg",
     "age": 21,
     "gender": "Female",
@@ -164,7 +164,7 @@
   {
     "fullName": "Carlos Mendes",
     "email": "carlos.m@example.com",
-    "passwordHash": "hashed_password_10",
+    "password": "hashed_password_10",
     "profilePhoto": "https://example.com/photos/carlos.jpg",
     "age": 29,
     "gender": "Male",
@@ -182,7 +182,7 @@
   {
     "fullName": "Fatima Zahra",
     "email": "fatima.z@example.com",
-    "passwordHash": "hashed_password_11",
+    "password": "hashed_password_11",
     "profilePhoto": "https://example.com/photos/fatima.jpg",
     "age": 23,
     "gender": "Female",
@@ -200,7 +200,7 @@
   {
     "fullName": "John Smith",
     "email": "john.smith@example.com",
-    "passwordHash": "hashed_password_12",
+    "password": "hashed_password_12",
     "profilePhoto": "https://example.com/photos/john.jpg",
     "age": 40,
     "gender": "Male",
@@ -218,7 +218,7 @@
   {
     "fullName": "Priya Sharma",
     "email": "priya.s@example.com",
-    "passwordHash": "hashed_password_13",
+    "password": "hashed_password_13",
     "profilePhoto": "https://example.com/photos/priya.jpg",
     "age": 25,
     "gender": "Female",
@@ -236,7 +236,7 @@
   {
     "fullName": "Liam O'Connor",
     "email": "liam.o@example.com",
-    "passwordHash": "hashed_password_14",
+    "password": "hashed_password_14",
     "profilePhoto": "https://example.com/photos/liam.jpg",
     "age": 33,
     "gender": "Male",
@@ -254,7 +254,7 @@
   {
     "fullName": "Noura El-Badri",
     "email": "noura.b@example.com",
-    "passwordHash": "hashed_password_15",
+    "password": "hashed_password_15",
     "profilePhoto": "https://example.com/photos/noura.jpg",
     "age": 28,
     "gender": "Female",
@@ -272,7 +272,7 @@
   {
     "fullName": "Ethan Walker",
     "email": "ethan.w@example.com",
-    "passwordHash": "hashed_password_16",
+    "password": "hashed_password_16",
     "profilePhoto": "https://example.com/photos/ethan.jpg",
     "age": 19,
     "gender": "Male",
@@ -290,7 +290,7 @@
   {
     "fullName": "Sofia Rossi",
     "email": "sofia.r@example.com",
-    "passwordHash": "hashed_password_17",
+    "password": "hashed_password_17",
     "profilePhoto": "https://example.com/photos/sofia.jpg",
     "age": 31,
     "gender": "Female",
@@ -308,7 +308,7 @@
   {
     "fullName": "James Parker",
     "email": "james.p@example.com",
-    "passwordHash": "hashed_password_18",
+    "password": "hashed_password_18",
     "profilePhoto": "https://example.com/photos/james.jpg",
     "age": 27,
     "gender": "Male",
@@ -326,7 +326,7 @@
   {
     "fullName": "Zara Patel",
     "email": "zara.p@example.com",
-    "passwordHash": "hashed_password_19",
+    "password": "hashed_password_19",
     "profilePhoto": "https://example.com/photos/zara.jpg",
     "age": 23,
     "gender": "Female",
@@ -344,7 +344,7 @@
   {
     "fullName": "Omar Farooq",
     "email": "omar.f@example.com",
-    "passwordHash": "hashed_password_20",
+    "password": "hashed_password_20",
     "profilePhoto": "https://example.com/photos/omar.jpg",
     "age": 36,
     "gender": "Male",

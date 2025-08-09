@@ -29,7 +29,17 @@ export const SignInDialog = ({ isOpen, onClose }: SignInDialogProps) => {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/signin", formData);
+      console.log("Sending sign in request:", formData);
+
+      const response = await axios.post(
+          "http://127.0.0.1:8000/api/signin/",
+          formData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
       // ✅ Store in localStorage
       localStorage.setItem("userData", JSON.stringify(response.data));

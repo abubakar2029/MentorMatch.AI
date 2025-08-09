@@ -8,25 +8,68 @@ from django.views.decorators.csrf import csrf_exempt
 # from utils.vector_db import add_to_vector_db, query_similar_profiles
 # from utils.embeddings import get_embedding
 from sentence_transformers import SentenceTransformer
-from chromadb import PersistentClient
+# from chromadb import PersistentClient
 from .models import Mentee, Mentor
 import json
 from django.http import JsonResponse
 from mongoengine.errors import NotUniqueError, ValidationError
 from .models import Mentor,Mentee
+# import pinecone
+from dotenv import load_dotenv
+from pinecone import Pinecone, ServerlessSpec
+
+load_dotenv()
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+PINECONE_ENV = os.getenv("PINECONE_ENV")
+
+# Initialize Pinecone (use your Pinecone API key & environment)
+# pinecone.init(api_key="YOUR_PINECONE_API_KEY", environment="YOUR_PINECONE_ENV")
+pc = Pinecone(api_key=PINECONE_API_KEY)
+
+# Create or connect to existing indexes for mentors and mentees
+# Create mentors index
+if "mentors" not in [index['name'] for index in pc.list_indexes()]:
+    pc.create_index(
+        name="mentors",
+        dimension=384,  # must match your embedding vector size
+        metric="cosine",  # or "dotproduct", "euclidean"
+        # cloud="aws",
+        # region="us-east-1"
+        spec=ServerlessSpec(
+            cloud="aws",
+            region="us-east-1"
+        )
+    )
+
+# Create mentees index
+if "mentees" not in [index['name'] for index in pc.list_indexes()]:
+    pc.create_index(
+        name="mentees",
+        dimension=384,
+        metric="cosine",
+        # cloud="aws",
+        # region="us-east-1"
+        spec=ServerlessSpec(
+            cloud="aws",
+            region="us-east-1"
+        )
+    )
+
+mentors_index = pc.Index("mentors")
+mentees_index = pc.Index("mentees")
 
 # Ensure Chroma directory exists (vector_db also creates client, so this is just defensive)
-CHROMA_DIR = "./chroma_store"
-os.makedirs(CHROMA_DIR, exist_ok=True)
+# CHROMA_DIR = "./chroma_store"
+# os.makedirs(CHROMA_DIR, exist_ok=True)
 
 # Load embedding model
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # Chroma client setup
-chroma_client = PersistentClient(path=CHROMA_DIR)
-collection = chroma_client.get_or_create_collection(name="mentors")
-mentors_collection = chroma_client.get_or_create_collection(name="mentors")
-mentees_collection = chroma_client.get_or_create_collection(name="mentees")
+# chroma_client = PersistentClient(path=CHROMA_DIR)
+# collection = chroma_client.get_or_create_collection(name="mentors")
+# mentors_collection = chroma_client.get_or_create_collection(name="mentors")
+# mentees_collection = chroma_client.get_or_create_collection(name="mentees")
 
 # @csrf_exempt
 # def vector_form_view(request):
@@ -127,6 +170,83 @@ mentees_collection = chroma_client.get_or_create_collection(name="mentees")
 # @csrf_exempt
 # def vector_search_view(request):
 
+from bson import ObjectId
+
+@csrf_exempt
+def signin_view(request):
+    if request.method != "POST":
+        return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        email = data.get("email", "").strip()
+        password = data.get("password", "").strip()
+
+        if not email or not password:
+            return JsonResponse({"status": "error", "message": "Email and password are required"}, status=400)
+
+        # Try finding the user in Mentor collection
+        user = Mentor.objects(email=email, password=password).first()
+        user_type = "mentor"
+
+        # If not found, try in Mentee collection
+        if not user:
+            user = Mentee.objects(email=email, password=password).first()
+            user_type = "mentee"
+
+        if not user:
+            return JsonResponse({"status": "error", "message": "Invalid email or password"}, status=401)
+
+        # Build user data for response
+        if user_type == "mentor":
+            user_data = {
+                "id": str(user.id),
+                "userType": "mentor",
+                "fullName": user.fullName,
+                "email": user.email,
+                "profilePhoto": user.profilePhoto,
+                "age": user.age,
+                "gender": user.gender,
+                "country": user.country,
+                "jobRole": user.jobRole,
+                "industry": user.industry,
+                "experienceYears": user.experienceYears,
+                "mentorshipTopics": user.mentorshipTopics,
+                "bio": user.bio,
+                "availability": user.availability,
+                "languages": user.languages,
+                "linkedIn": user.linkedIn,
+                "website": user.website
+            }
+        else:
+            user_data = {
+                "id": str(user.id),
+                "userType": "mentee",
+                "fullName": user.fullName,
+                "email": user.email,
+                "profilePhoto": user.profilePhoto,
+                "age": user.age,
+                "gender": user.gender,
+                "country": user.country,
+                "currentRole": user.currentRole,
+                "industryInterest": user.industryInterest,
+                "experienceYears": user.experienceYears,
+                "mentorshipGoals": user.mentorshipGoals,
+                "bio": user.bio,
+                "availability": user.availability,
+                "languages": user.languages,
+                "linkedIn": user.linkedIn,
+                "website": user.website
+            }
+
+        return JsonResponse({"status": "success", "user": user_data}, status=200)
+
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": f"Unexpected error: {str(e)}"}, status=500)
+
+
+
+
 @csrf_exempt
 def search_mentor_profiles(request):
     """
@@ -136,7 +256,7 @@ def search_mentor_profiles(request):
         try:
             data = json.loads(request.body)
 
-            # Build a description string from request data (reuse your helper)
+            # Build a temporary mentee object
             temp_mentee = Mentee(
                 fullName=data.get('fullName', ''),
                 email=data.get('email', ''),
@@ -161,21 +281,65 @@ def search_mentor_profiles(request):
             # Encode mentee description
             query_embedding = model.encode(description).tolist()
 
-            # Search in Chroma mentor collection
-            search_results = mentors_collection.query(
-                query_embeddings=[query_embedding],
-                n_results=5,  # Top 5 results
-                include=["embeddings", "distances", "metadatas", "documents"]
+            # Query Pinecone mentors index
+            query_response = mentors_index.query(
+                vector=query_embedding,
+                top_k=5,
+                include_metadata=True,
+                include_values=False
             )
+
+            # Map IDs to scores
+            score_map = {match['id']: match['score'] for match in query_response.get('matches', [])}
+
+            # Convert IDs to ObjectId for MongoDB query
+            matched_object_ids = []
+            for mid in score_map.keys():
+                try:
+                    matched_object_ids.append(ObjectId(mid))
+                except:
+                    pass  # Skip invalid IDs
+
+            # Fetch matching mentor documents
+            matched_mentors = list(Mentor.objects(id__in=matched_object_ids))
+
+            # Build final response with score
+            mentor_data = []
+            for mentor in matched_mentors:
+                mentor_data.append({
+                    "id": str(mentor.id),
+                    "score": round(score_map.get(str(mentor.id)), 4),
+                    "fullName": mentor.fullName,
+                    "email": mentor.email,
+                    "profilePhoto": mentor.profilePhoto,
+                    "age": mentor.age,
+                    "gender": mentor.gender,
+                    "country": mentor.country,
+                    "jobRole": mentor.jobRole,
+                    "industry": mentor.industry,
+                    "experienceYears": mentor.experienceYears,
+                    "mentorshipTopics": mentor.mentorshipTopics,
+                    "bio": mentor.bio,
+                    "availability": mentor.availability,
+                    "languages": mentor.languages,
+                    "linkedIn": mentor.linkedIn,
+                    "website": mentor.website
+                })
+
+            # Sort by score (highest first)
+            mentor_data.sort(key=lambda x: x["score"], reverse=True)
 
             return JsonResponse({
                 "status": "success",
                 "query": description,
-                "results": search_results
+                "results": mentor_data
             }, status=200)
 
         except Exception as e:
-            return JsonResponse({"status": "error", "message": f"Unexpected error: {str(e)}"}, status=500)
+            return JsonResponse({
+                "status": "error",
+                "message": f"Unexpected error: {str(e)}"
+            }, status=500)
 
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
 
@@ -189,7 +353,7 @@ def search_mentee_profiles(request):
         try:
             data = json.loads(request.body)
 
-            # Build a description string from request data (reuse your helper)
+            # Create a temporary Mentor object from input
             temp_mentor = Mentor(
                 fullName=data.get('fullName', ''),
                 email=data.get('email', ''),
@@ -214,17 +378,53 @@ def search_mentee_profiles(request):
             # Encode mentor description
             query_embedding = model.encode(description).tolist()
 
-            # Search in Chroma mentee collection
-            search_results = mentees_collection.query(
-                query_embeddings=[query_embedding],
-                n_results=5,  # Top 5 results
-                include=["embeddings", "distances", "metadatas", "documents"]
+            # Query Pinecone mentees index
+            query_response = mentees_index.query(
+                vector=query_embedding,
+                top_k=5,
+                include_metadata=True,
+                include_values=False
             )
+
+            # Map IDs to scores
+            score_map = {match['id']: match['score'] for match in query_response['matches']}
+
+            # Extract the matched IDs
+            matched_ids = list(score_map.keys())
+
+            # Fetch Mentee profiles from MongoDB
+            matched_mentees = list(Mentee.objects(id__in=matched_ids))
+
+            # Convert to JSON-safe dicts with score
+            mentee_data = []
+            for mentee in matched_mentees:
+                mentee_data.append({
+                    "id": str(mentee.id),
+                    "score": score_map.get(str(mentee.id), None),
+                    "fullName": mentee.fullName,
+                    "email": mentee.email,
+                    "profilePhoto": mentee.profilePhoto,
+                    "age": mentee.age,
+                    "gender": mentee.gender,
+                    "country": mentee.country,
+                    "currentRole": mentee.currentRole,
+                    "industryInterest": mentee.industryInterest,
+                    "experienceYears": mentee.experienceYears,
+                    "mentorshipGoals": mentee.mentorshipGoals,
+                    "bio": mentee.bio,
+                    "availability": mentee.availability,
+                    "languages": mentee.languages,
+                    "linkedIn": mentee.linkedIn,
+                    "website": mentee.website
+                })
+
+            # Sort results by score (highest first)
+            mentee_data.sort(key=lambda x: x["score"], reverse=True)
 
             return JsonResponse({
                 "status": "success",
                 "query": description,
-                "results": search_results
+                "results": mentee_data
             }, status=200)
 
         except Exception as e:
@@ -277,11 +477,11 @@ def save_mentor_profile(request):
             # ✅ Save bio embedding to Chroma
             # if data.get("bio"):
             embedding = model.encode(description).tolist()
-            mentors_collection.add(
-                # documents=[description],
-                embeddings=[embedding],
-                ids=[str(mentor.id)]
+            mentors_index.upsert(
+            vectors=[(str(mentor.id), embedding)]
             )
+
+            print(f"✅ Mentor vector added to Pinecone with ID: {mentor.id}")
 
             return JsonResponse({"status": "success", "id": str(mentor.id)}, status=201)
 
@@ -334,13 +534,14 @@ def save_mentee_profile(request):
 
             # ✅ Save bio embedding to Chroma
             embedding = model.encode(description).tolist()
-            mentees_collection.add(
-                # documents=[description],
-                embeddings=[embedding],
-                ids=[str(mentee.id)]
+            mentees_index.upsert(
+            vectors=[(str(mentee.id), embedding)]
             )
-            result = mentees_collection.get(ids=[str(mentee.id)])
-            print("From Chroma:", result)
+
+            print(f"✅ Mentee vector added to Pinecone with ID: {mentee.id}")
+            
+            # result = mentees_index.fetch(ids=[str(mentee.id)])
+            # print("From Chroma:", result)
 
             
             print(f"✅ Mentee profile saved successfully with ID: {mentee.id}")
